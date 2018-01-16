@@ -1,5 +1,6 @@
 package me.sabbirahmed.androidconcurrency;
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +27,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void runCode(View view) {
         log("Run code");
+        displayProgressBar(true);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                displayProgressBar(false);
+            }
+        };
+
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 3000);
 
     }
 
