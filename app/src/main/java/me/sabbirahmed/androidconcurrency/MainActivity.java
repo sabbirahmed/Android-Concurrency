@@ -1,5 +1,6 @@
 package me.sabbirahmed.androidconcurrency;
 
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -21,8 +22,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextView;
     private ProgressBar mProgressBar;
 
-    ExecutorService mExecutor;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,16 +31,13 @@ public class MainActivity extends AppCompatActivity {
         mTextView = findViewById(R.id.textViewLog);
         mProgressBar = findViewById(R.id.progressBar);
 
-        mExecutor = Executors.newFixedThreadPool(5);
 
     }
 
     public void runCode(View view) {
 
-        for (int i = 0; i < 10; i++){
-            Runnable worker = new BackgroundTask(i);
-            mExecutor.execute(worker);
-        }
+        MyTask task = new MyTask();
+        task.execute("sabbir", "Rumana", "shuvo", "ashik");
 
     }
 
@@ -69,6 +65,23 @@ public class MainActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
           mProgressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    class MyTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String value: strings){
+                Log.i("String Value", value);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
         }
     }
 
