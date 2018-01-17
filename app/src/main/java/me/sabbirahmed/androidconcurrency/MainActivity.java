@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             for (String value: strings){
                 Log.i("String Value", value);
-                publishProgress(value);
+
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -82,11 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            log(values[0]);
         }
     }
 
