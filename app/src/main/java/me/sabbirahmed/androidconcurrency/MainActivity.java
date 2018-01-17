@@ -11,15 +11,17 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final String MESSAGE_KEY = "message_key";
     private ScrollView mScroll;
     private TextView mTextView;
     private ProgressBar mProgressBar;
 
-    private Handler mHandler;
+    ExecutorService mExecutor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,44 +32,16 @@ public class MainActivity extends AppCompatActivity {
         mTextView = findViewById(R.id.textViewLog);
         mProgressBar = findViewById(R.id.progressBar);
 
-        mHandler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle bundle = msg.getData();
-                String message = bundle.getString(MESSAGE_KEY);
-                log(message);
-                displayProgressBar(false);
-            }
-        };
+        mExecutor = Executors.newFixedThreadPool(5);
 
     }
 
     public void runCode(View view) {
-        log("Run code");
-        displayProgressBar(true);
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.e(TAG, "Run: starting thread after 4 seconds");
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Message message = new Message();
-                Bundle bundle = new Bundle();
-                bundle.putString(MESSAGE_KEY, "Thread is complete");
-                message.setData(bundle);
-                mHandler.sendMessage(message);
-            }
-        };
-
-//        Handler handler = new Handler();
-//        handler.postDelayed(runnable, 3000);
-
-        Thread thread = new Thread(runnable);
-        thread.start();
+        for (int i = 0; i < 10; i++){
+            Runnable worker = new BackgroundTask(i);
+            mExecutor.execute(worker);
+        }
 
     }
 
