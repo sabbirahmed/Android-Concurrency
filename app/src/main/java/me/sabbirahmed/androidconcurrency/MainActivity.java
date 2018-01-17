@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView mScroll;
     private TextView mTextView;
     private ProgressBar mProgressBar;
+    private MyTask mTask;
+    private boolean mTaskRun;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void runCode(View view) {
 
-        MyTask task = new MyTask();
-        task.execute("sabbir", "Rumana", "shuvo", "ashik");
+        if (mTaskRun && mTask != null){
+            mTask.cancel(true);
+            mTaskRun = false;
+        } else {
+            mTask = new MyTask();
+            mTask.execute("sabbir", "Rumana", "shuvo", "ashik");
+            mTaskRun = true;
+        }
+
 
     }
 
@@ -73,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             for (String value: strings){
+                if (isCancelled()){
+                    publishProgress("Cancelled");
+                    break;
+                }
                 Log.i("String Value", value);
                 publishProgress(value);
                 try {
@@ -92,6 +105,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             log(s);
+        }
+
+        @Override
+        protected void onCancelled() {
+            log("Task cancel");
+        }
+
+        @Override
+        protected void onCancelled(String s) {
+            log("cancelled" + s);
         }
     }
 
