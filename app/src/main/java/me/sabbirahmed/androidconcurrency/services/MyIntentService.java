@@ -3,6 +3,7 @@ package me.sabbirahmed.androidconcurrency.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 /**
@@ -22,6 +23,8 @@ public class MyIntentService extends IntentService {
     private static final String EXTRA_PARAM1 = "me.sabbirahmed.androidconcurrency.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "me.sabbirahmed.androidconcurrency.extra.PARAM2";
     public static final String CODE_RUNNER = "CodeRunner";
+    public static final String SERVICE_MESSAGE = "ServiceMessage";
+    public static final String MESSAGE_KEY = "message";
 
     public MyIntentService() {
         super("MyIntentService");
@@ -59,7 +62,7 @@ public class MyIntentService extends IntentService {
      * parameters.
      */
     private void handleActionFoo(String param1, String param2) {
-        Log.i(CODE_RUNNER, "handleActionFoo: Start service");
+        sendMessage("handleActionFoo: Start service");
 
         try {
             Thread.sleep(3000);
@@ -67,7 +70,7 @@ public class MyIntentService extends IntentService {
             e.printStackTrace();
         }
 
-        Log.i(CODE_RUNNER, "handleActionFoo: End service");
+        sendMessage("handleActionFoo: End service");
     }
 
     @Override
@@ -80,5 +83,12 @@ public class MyIntentService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(CODE_RUNNER, "onDestroy");
+    }
+
+    private void sendMessage(String message){
+        Intent intent = new Intent(SERVICE_MESSAGE);
+        intent.putExtra(MESSAGE_KEY, message);
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(intent);
     }
 }
