@@ -1,31 +1,43 @@
 package me.sabbirahmed.androidconcurrency;
 
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import me.sabbirahmed.androidconcurrency.services.MyIntentService;
-
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    public static final String TAG = "CodeRunner";
     private ScrollView mScroll;
     private TextView mTextView;
     private ProgressBar mProgressBar;
 
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    private MyService mService;
+
+    private final ServiceConnection mServiceCon = new ServiceConnection() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(MyIntentService.MESSAGE_KEY);
-            log(message);
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MyService.ServiceBinder serviceBinder = (MyService.ServiceBinder) iBinder;
+            mService = serviceBinder.getService();
+
+            Log.i(TAG, "onServiceConnected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            if (mService != null){
+                mService = null;
+            }
+
+            Log.i(TAG, "onServiceDisconnected");
         }
     };
 
@@ -44,22 +56,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(getApplicationContext())
-                .registerReceiver(mReceiver, new IntentFilter(MyIntentService.SERVICE_MESSAGE));
+        Intent serviceIntent = new Intent(this, MyService.class);
+        bindService(serviceIntent, mServiceCon, Context.BIND_AUTO_CREATE);
+        Log.i(TAG, "onStart: Service bind");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(getApplicationContext())
-                .unregisterReceiver(mReceiver);
+        unbindService(mServiceCon);
+        Log.i(TAG, "onStop: Service stop");
     }
 
     public void runCode(View view) {
 
-        log("Running Code");
+        log(mService.getValue());
 
-        MyIntentService.startActionFoo(this, "Value 1", "Value 2");
     }
 
     private void log(String message) {
