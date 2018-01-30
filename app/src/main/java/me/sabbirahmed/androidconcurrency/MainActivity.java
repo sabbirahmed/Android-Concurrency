@@ -1,5 +1,7 @@
 package me.sabbirahmed.androidconcurrency;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "CodeRunner";
+    public static final int JOB_ID = 1001;
     private ScrollView mScroll;
     private TextView mTextView;
     private ProgressBar mProgressBar;
@@ -44,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void runCode(View view) {
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        JobInfo jobInfo = new JobInfo.Builder(JOB_ID,
+                new ComponentName(this, MyJobService.class))
+                .setMinimumLatency(0)
+                .build();
+
+        jobScheduler.schedule(jobInfo);
 
 
     }
