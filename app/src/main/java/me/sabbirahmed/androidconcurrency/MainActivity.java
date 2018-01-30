@@ -20,27 +20,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextView;
     private ProgressBar mProgressBar;
 
-    private MyService mService;
-
-    private final ServiceConnection mServiceCon = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MyService.ServiceBinder serviceBinder = (MyService.ServiceBinder) iBinder;
-            mService = serviceBinder.getService();
-
-            Log.i(TAG, "onServiceConnected");
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            if (mService != null){
-                mService = null;
-            }
-
-            Log.i(TAG, "onServiceDisconnected");
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,21 +35,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent serviceIntent = new Intent(this, MyService.class);
-        bindService(serviceIntent, mServiceCon, Context.BIND_AUTO_CREATE);
-        Log.i(TAG, "onStart: Service bind");
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(mServiceCon);
-        Log.i(TAG, "onStop: Service stop");
     }
 
     public void runCode(View view) {
 
-        log(mService.getValue());
 
     }
 
