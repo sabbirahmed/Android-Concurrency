@@ -2,11 +2,14 @@ package me.sabbirahmed.androidconcurrency;
 
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextView;
     private ProgressBar mProgressBar;
 
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            log("job message service receive");
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +48,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .registerReceiver(broadcastReceiver, new IntentFilter("Service"));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .unregisterReceiver(broadcastReceiver);
     }
 
     public void runCode(View view) {
